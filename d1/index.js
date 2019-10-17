@@ -8,6 +8,19 @@ server.use(express.json());
 // array para armazenar os dados dos projetos
 const projects = [];
 
+// Middleware que verifica se o projeto existe 
+
+function checkProjectExists(req, res, next) {
+    const { id } = req.params;
+    const project = projects.find(p => p.id == id);
+  
+    if (!project) {
+      return res.status(400).json({ error: 'Project not found' });
+    }
+  
+    return next();
+  }
+
 // recebe um novo projeto ainda sem nenhuma tarefa
 server.post('/projects', (req, res) => {
     const {id, title} = req.body;
@@ -28,8 +41,8 @@ server.get ('/projects',(req,res)=>{
     return res.json(projects);
 })
 
-// altera o titulo de um projeto atraves do id
-server.put('/projects/:id', (req,res)=>{
+// altera o titulo de um projeto atraves do id -- com middleware 
+server.put('/projects/:id',checkProjectExists, (req,res)=>{
     const {id} = req.params;
     const {title}= req.body;
 
@@ -41,8 +54,8 @@ server.put('/projects/:id', (req,res)=>{
 
 })
 
-//deleta um projeto atraves do id
-server.delete('/projects/:id', (req,res)=>{
+//deleta um projeto atraves do id -- com middleware 
+server.delete('/projects/:id',checkProjectExists, (req,res)=>{
     const {id} = req.params;
     
     const projectIndex =  projects.findIndex(p => p.id == id);
@@ -52,9 +65,8 @@ server.delete('/projects/:id', (req,res)=>{
     return res.send();
 })
 
-// adiciona uma tarefa atraves do id do projeto
-
-server.put('/projects/:id/tasks', (req,res)=>{
+// adiciona uma tarefa atraves do id do projeto -- com middleware 
+server.put('/projects/:id/tasks',checkProjectExists, (req,res)=>{
     const {id} = req.params;
     const {title} = req.body;
     
