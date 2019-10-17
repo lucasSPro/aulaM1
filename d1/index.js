@@ -4,7 +4,8 @@ const server = express();
 
 server.use(express.json());
 
-
+// var numero de requisições para o log
+let numberOfRequests = 0;
 // array para armazenar os dados dos projetos
 const projects = [];
 
@@ -20,6 +21,17 @@ function checkProjectExists(req, res, next) {
   
     return next();
   }
+
+// Middleware que da o numero de requisições
+function logRequests(req, res, next) {
+    numberOfRequests++;
+  
+    console.log(`Número de requisições: ${numberOfRequests}`);
+  
+    return next();
+}
+
+logRequests();
 
 // recebe um novo projeto ainda sem nenhuma tarefa
 server.post('/projects', (req, res) => {
